@@ -1,48 +1,38 @@
 ---
-title: "Calibración micropipetas"
+title: "Calibración micropipetas v.JM"
 author: "MCM"
 format: html
 editor: visual
+execute: 
+  warning: false
+editor_options: 
+  chunk_output_type: console
 ---
 
-## 
-
 ```{r}
-
 library(readxl)
 library(purrr)
 library(dplyr)
 library(tidyr)
-
-archivo <-  "data/calibracion_micropip_agosto.xlsx"
-hojas <-  c("micropipet_2", "micropipet_20", "micropipet_100", "micropipet_0,2_rep")
-
-datos <-  map(hojas, ~read_excel(archivo, sheet = .x)) 
-#map toma cada elemento de hojas, y lo pasa a la función read_excel, para leer cada hoja correspondiente
-#.x representa cada elemento de la lista hojas en cada iteración: en la primera iteración, será micropipet_2, en la segunda micropipet_20...
-
-#asignamos nombres
-names(datos) <-  c("pipeta2_20", "pipeta20_200", "pipeta100_1000", "pipeta0.2_rep")
+library(kableExtra)
 
 
+path <- "data/calibracion_micropip_agosto.xlsx"
+hojas <- excel_sheets(path)
 
+### función para calcular el CV y redondeo a un decimal
+cv <- function(x,...){
+  round (sd(x)/mean(x)*100,1)}
 
-#para tratar bien los datos, reorganizamos el df a formato long
-datos_long <-  map(datos, ~ .x %>%
-                   pivot_longer(
-                     cols = everything(),
-                     names_to = "Volumen",
-                     values_to = "Peso"
-                   )
-                  )
-#ahora podemos calcular la estadística
-datos_estadisticos <-  map(datos_long, ~.x %>%
-                           group_by(Volumen) %>%
-                           summarise(
-                             media_peso = mean(Peso),
-                             desviacion_peso = sd(Peso),
-                             CV_peso = (sd(Peso)/ mean(Peso))*100
-                           )
-                         )
-                      
+datos <- map(hojas, read_xlsx, path = path) |> 
+  set_names(hojas) |> 
+  map(\(x) summarise(x, across(everything(), list (media = mean, desv = sd, CV= cv),na.rm = TRUE)))
 ```
+
+
+```{r}
+index=1:5
+imap (datos,\(x,index)  kbl(x,caption = names(datos[index])) |> kable_styling("striped"))
+
+```
+
