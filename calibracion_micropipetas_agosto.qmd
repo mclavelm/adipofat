@@ -12,7 +12,7 @@ editor: visual
 library(readxl)
 library(purrr)
 
-archivo = "~/investigo/labo/calibracion_micropip_agosto.xlsx"
+archivo = "data/calibracion_micropip_agosto.xlsx"
 hojas = c("micropipet_2", "micropipet_20", "micropipet_100", "micropipet_0,2_rep")
 
 datos = map(hojas, ~read_excel(archivo, sheet = .x)) 
