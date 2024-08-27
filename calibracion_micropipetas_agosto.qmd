@@ -43,5 +43,7 @@ datos_estadisticos = map(datos_long, ~.x %>%
                              CV_peso = (sd(Peso)/ mean(Peso))*100
                            )
                          )
+
+#añado algo de prueba 
                       
 ```
