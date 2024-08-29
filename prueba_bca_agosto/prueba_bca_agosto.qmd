@@ -1,0 +1,14 @@
+---
+title: "Prueba BCA agosto"
+author: "MCM"
+format: html
+editor: visual
+---
+
+## Cuantificación proteína total
+
+```{r}
+#limpiar y reordenar el archivo
+
+
+```
