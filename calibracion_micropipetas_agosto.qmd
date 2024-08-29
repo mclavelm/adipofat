@@ -10,9 +10,10 @@ editor_options:
 ---
 
 ```{r}
-library(readxl)
-library(purrr)
-library(dplyr)
+install.packages("kableExtra") 
+library(readxl)  
+library(purrr)  #manipulación de listas y aplicar funciones a cada elemento
+library(dplyr)  #manipulación de datos 
 library(tidyr)
 library(kableExtra)
 
@@ -29,10 +30,8 @@ datos <- map(hojas, read_xlsx, path = path) |>
   map(\(x) summarise(x, across(everything(), list (media = mean, desv = sd, CV= cv),na.rm = TRUE)))
 ```
 
-
 ```{r}
 index=1:5
 imap (datos,\(x,index)  kbl(x,caption = names(datos[index])) |> kable_styling("striped"))
 
 ```
-
