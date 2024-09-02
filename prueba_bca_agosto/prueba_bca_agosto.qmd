@@ -5,10 +5,39 @@ format: html
 editor: visual
 ---
 
-## Cuantificación proteína total
+## Cuantificación proteína en suero
 
 ```{r}
-#limpiar y reordenar el archivo
+#obtener los diferentes datos a partir de la tabla inicial
+datos_calibrado <- PRUEBA_BCA_MARINA[1:2, ]
+datos_calibrado <- datos_calibrado[, !(names(datos_calibrado) %in% "1")] #eliminar primera columna
+datos_calibrado <- datos_calibrado[, -c((n-1):n)] #eliminar últimas columnas
+datos_suero<- PRUEBA_BCA_MARINA[3:5, ]
+```
 
+```{r}
+#trabajamos la tabla del calibrado
+colnames(datos_calibrado) <- c("2000", "1500", "1000", "750", "500", "250", "125", "25", "0")
+datos_calibrado <- lapply(datos_calibrado, function(x) as.numeric(gsub(",", ".", x)))
+datos_calibrado <- as.data.frame(datos_calibrado)
+str(datos_calibrado)
+medias_absorbancia <- colMeans (datos_calibrado)
+fila_medias <- as.data.frame(t(medias_absorbancia))
+datos_calibrado_media <- rbind(datos_calibrado, fila_medias)
+
+library(ggplot2)
+library(dplyr)
+
+#me quedo aquí, falta ahora hacer la recta con la media de las absorbancias obtenidas 
+```
+
+```{r}
+
+
+
+
+```
+
+```{r}
 
 ```
