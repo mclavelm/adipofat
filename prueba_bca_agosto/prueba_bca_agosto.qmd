@@ -17,27 +17,73 @@ datos_suero<- PRUEBA_BCA_MARINA[3:5, ]
 
 ```{r}
 #trabajamos la tabla del calibrado
+datos_calibrado <- as.data.frame(datos_calibrado)
 colnames(datos_calibrado) <- c("2000", "1500", "1000", "750", "500", "250", "125", "25", "0")
-datos_calibrado <- lapply(datos_calibrado, function(x) as.numeric(gsub(",", ".", x)))
+#convertir los valores de las columnas a numérico
+datos_calibrado <- lapply(datos_calibrado, function(x) as.numeric(gsub(",", ".", x))) 
+datos_calibrado <- as.data.frame(datos_calibrado)
+#renombrar las columnas para eliminar el prefijo x
+colnames(datos_calibrado) <- c("2000", "1500", "1000", "750", "500", "250", "125", "25", "0")
+
 datos_calibrado <- as.data.frame(datos_calibrado)
 str(datos_calibrado)
 medias_absorbancia <- colMeans (datos_calibrado)
 fila_medias <- as.data.frame(t(medias_absorbancia))
 datos_calibrado_media <- rbind(datos_calibrado, fila_medias)
 
+
+```
+
+```{r}
+absorbancia <- as.numeric(unlist(datos_calibrado_media[nrow(datos_calibrado_media), ]))
+#extraemos los nombres de las columnas (concentraciones) y convertimos esos nombres en números
+concentracion <- as.numeric(names(datos_calibrado_media)) 
+
+#ajustar el modelo lineal
+modelo_calibrado <- lm(absorbancia ~concentracion)
+
+#graficar la recta
+plot(concentracion, absorbancia, pch = 1, col = "blue", xlab = "Concentración (µg/ml)", ylab = "Absorbancia", main = "Recta de calibrado")
+abline(modelo_calibrado, col = "red")
+
+#obtener los parámetros del modelo
+coeficientes <- coef(modelo_calibrado)
+intercepto <- coeficientes[1]
+pendiente <- coeficientes[2]
+r2 <- summary(modelo_calibrado)$r.squared
+
+texto <- paste("y=", round(intercepto, 2), "+", round(pendiente, 5), "*x\nR^2 =", round(r2, 2))
+#lo añadimos al gráfico
+text(x = max(concentracion) * 0.7, y= max(absorbancia) * 0.9, labels= texto, pos = 4, cex = 0.8, col = "black")
+
+```
+
+```{r}
+#probamos con broom::tidy() 
+library(broom)
 library(ggplot2)
-library(dplyr)
+absorbancia <- as.numeric(unlist(datos_calibrado_media[nrow(datos_calibrado_media), ]))
+concentracion <- as.numeric(names(datos_calibrado_media)) 
+modelo_calibrado <- lm(absorbancia ~concentracion)
 
-#me quedo aquí, falta ahora hacer la recta con la media de las absorbancias obtenidas 
+#hasta aquí, igual que antes; ahora,  convertimos el modelo ajustado en un df con coeficientes y estadísticas 
+modelo_tidy <- tidy(modelo_calibrado)
+
+#hacemos la gráfica ahora con ggplot en vez de plot
+ggplot(data = data.frame(concentracion, absorbancia), aes(x= concentracion, y= absorbancia))+
+  geom_point(color= "blue")+ 
+  geom_smooth(method = "lm", se= FALSE, color= "red")+
+  annotate("text", x = max(concentracion) *0.7, y= max(absorbancia) *0.9, 
+           label = paste("y=", round(modelo_tidy$estimate[1], 2), "+", round(modelo_tidy$estimate[2], 5),"* x\nR^2 =", round(summary(modelo_calibrado)$r.squared, 2)),
+           color = "black", size = 3.5) +
+  labs(title = "Recta de calibrado broom", x= "Concentración (µg/ml)", y= "Absorbancia")
+
+
+
+
 ```
 
 ```{r}
 
-
-
-
-```
-
-```{r}
 
 ```
