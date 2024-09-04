@@ -84,6 +84,25 @@ ggplot(data = data.frame(concentracion, absorbancia), aes(x= concentracion, y= a
 ```
 
 ```{r}
+#primero, calculamos la media por cada dilución
+datos_suero <- datos_suero[, !(names(datos_suero) %in% "1")]
+datos_suero <- datos_suero[, -((ncol(datos_suero)-4):ncol(datos_suero))]
+datos_suero <- as.data.frame(datos_suero)
+colnames(datos_suero) <- c("1", "2", "3", "4", "5", "6")
+datos_suero <- lapply(datos_suero, function(x) as.numeric(gsub(",", ".", x)))
+datos_suero <- as.data.frame(datos_suero)
+medias_abs_suero <- colMeans (datos_suero)
+fila_medias_suero <- as.data.frame(t(medias_abs_suero))
+datos_suero_media <- rbind(datos_suero, fila_medias_suero)
 
 
+```
+
+```{r}
+#aplicar la ecuación de la recta
+absorbancias_problema <- as.numeric(datos_suero_media[nrow(datos_suero_media), ])
+concentraciones_problema <- (absorbancias_problema - intercepto)/ pendiente
+```
+
+```{}
 ```
